@@ -20,7 +20,6 @@ public class UserCreate {
         userApi.createdSuccessfully(response);
         ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
         accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        //accessToken = userApi.loggedIsSuccessfully(loginResponse);
         assertNotNull(accessToken);
     }
 

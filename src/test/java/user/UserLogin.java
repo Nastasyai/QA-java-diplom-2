@@ -18,7 +18,6 @@ public class UserLogin {
         userApi.createdSuccessfully(response);
         ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
         accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        //accessToken = userApi.loggedIsSuccessfully(loginResponse);
     }
 
     @Test
@@ -41,23 +40,6 @@ public class UserLogin {
         userApi.loggedNotSuccessfully(loginResponse);
     }
 
-
-//    @Test
-//    @DisplayName("Некорректный пароль курьера")
-//    public void courierLoginPassword404() {
-//        var courier = CourierGenerator.random();
-//        ValidatableResponse response = client.create(courier);
-//        check.createdSuccessfully(response);
-//        LoginCourier loginCourier = LoginCourier.from(courier);
-//        ValidatableResponse loginResponseSuccessfully = client.login(loginCourier);
-//        courierId = check.loggedIsSuccessfully(loginResponseSuccessfully);
-//        Map<String, String> logData = new HashMap<>();
-//        logData.put("login", courier.getLogin());
-//        logData.put("password", courier.getPassword() + "0000");
-//        ValidatableResponse loginResponse = client.loginNotAllBody(logData);
-//        check.loggedNotSuccessfully404(loginResponse);
-//    }
-
     @Test
     @DisplayName("Изменение данных пользователя с авторизацией")
     public void editWithAuth() {
@@ -66,7 +48,6 @@ public class UserLogin {
         userApi.createdSuccessfully(response);
         ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
         accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        //accessToken = userApi.loggedIsSuccessfully(loginResponse);
         ValidatableResponse editResponse = userClient.edit(user, accessToken);
         userApi.editWithAuth(editResponse);
     }
