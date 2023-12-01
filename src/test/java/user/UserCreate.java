@@ -15,28 +15,29 @@ public class UserCreate {
     @Test
     @DisplayName("Создание уникального пользователя")
     public void createdSuccessfully() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
         ValidatableResponse response = userClient.create(user);
         userApi.createdSuccessfully(response);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
-        accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
+        LoginUser loginUser = LoginUser.from(user);
+        ValidatableResponse loginResponse = userClient.login(loginUser);
+        accessToken = userApi.loggedIsSuccessfully(loginResponse);
         assertNotNull(accessToken);
     }
 
     @Test
     @DisplayName("Создание пользователя, который уже зарегистрирован")
     public void createdNotSuccessfully() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
         ValidatableResponse response = userClient.create(user);
         userApi.createdSuccessfully(response);
-        ValidatableResponse loginResponse1 = userClient.create(user);
-        userApi.createdNotSuccessfully(loginResponse1);
+        ValidatableResponse response1 = userClient.create(user);
+        userApi.createdNotSuccessfully(response1);
     }
 
     @Test
     @DisplayName("Заполнение не всех обязательных полей")
     public void creationWithBadRequest() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.generic();
         ValidatableResponse response = userClient.create(user);
         userApi.creationWithBadRequest(response);
     }

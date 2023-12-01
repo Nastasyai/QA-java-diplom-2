@@ -1,13 +1,15 @@
 package helper;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import user.CreateUser;
+import user.User;
 
 public class UserGeneration {
-    public static CreateUser getUser() {
-        String name = RandomStringUtils.randomAlphabetic(10);
-        String password = RandomStringUtils.randomAlphabetic(10);
-        String email = RandomStringUtils.randomAlphabetic(10) + "@example.ru";
-        return new CreateUser(name, email, password);
+    public static User generic () {
+        var createUser = new User("name", "password", "");
+        return createUser;
+    }
+
+    public static User random() {
+        return new User("name", "password", RandomStringUtils.randomAlphanumeric(5, 10)+"@yandex.ru");
     }
 }

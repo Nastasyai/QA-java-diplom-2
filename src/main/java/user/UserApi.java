@@ -9,8 +9,8 @@ import static org.hamcrest.Matchers.is;
 public class UserApi {
 
     //логин под существующим пользователем,
-    public int loggedIsSuccessfully(ValidatableResponse loginResponse) {
-        int accessToken = loginResponse
+    public String loggedIsSuccessfully(ValidatableResponse loginResponse) {
+        String accessToken = loginResponse
                 .assertThat()
                 .statusCode(HttpURLConnection.HTTP_OK)
                 .extract()
@@ -31,7 +31,7 @@ public class UserApi {
         response
                 .assertThat()
                 .statusCode(HttpURLConnection.HTTP_OK)
-                .body("message", is(true));
+                .body("success", is(true));
     }
 
     //создать пользователя, который уже зарегистрирован;
@@ -63,6 +63,18 @@ public class UserApi {
                 .assertThat()
                 .statusCode(HttpURLConnection.HTTP_UNAUTHORIZED)
                 .body("message", is("You should be authorised"));
+    }
 
+    public void edited403(ValidatableResponse response) {
+        response
+                .assertThat()
+                .statusCode(HttpURLConnection.HTTP_FORBIDDEN)
+                .body("message", is("User with such email already exists"));
+    }
+
+    public void deleted(ValidatableResponse response) {
+        response
+                .assertThat()
+                .statusCode(HttpURLConnection.HTTP_ACCEPTED);
     }
 }

@@ -7,7 +7,7 @@ import static io.restassured.RestAssured.given;
 
 public class ConfigurationApi {
 
-    public final static String BASE_URL = "https://stellarburgers.nomoreparties.site/";
+    public final static String BASE_URL = "https://stellarburgers.nomoreparties.site";
 
     public RequestSpecification getRequestSpec () {
         return given().log().all()

@@ -5,6 +5,9 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserLogin {
     private final UserClient userClient = new UserClient();
     private final UserApi userApi = new UserApi();
@@ -13,52 +16,61 @@ public class UserLogin {
     @Test
     @DisplayName("Логин под существующим пользователем")
     public void loggedIsSuccessfully() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
         ValidatableResponse response = userClient.create(user);
         userApi.createdSuccessfully(response);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
-        accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
+        LoginUser loginUser = LoginUser.from(user);
+        ValidatableResponse loginResponse = userClient.login(loginUser);
+        accessToken = userApi.loggedIsSuccessfully(loginResponse);
     }
 
     @Test
     @DisplayName("Логин с неверным логином")
     public void loggedWithoutLogin() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
+        Map<String, String> wrongLogData = new HashMap<>();
+        wrongLogData.put("email", user.getEmail());
+        wrongLogData.put("password", user.getPassword()+"password111");
+        System.out.println(wrongLogData);
         ValidatableResponse response = userClient.create(user);
         userApi.createdSuccessfully(response);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(null, user.getPassword()));
-        userApi.loggedNotSuccessfully(loginResponse);
+        ValidatableResponse response1 = userClient.loginWithoutBody(wrongLogData);
+        userApi.loggedNotSuccessfully(response1);
     }
 
     @Test
     @DisplayName("Логин с неверным паролем")
     public void loggedWithoutPassword() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
+        Map <String, String> wrongLogData = new HashMap<>();
+        wrongLogData.put("email", user.getEmail()+"email111");
+        wrongLogData.put("password", user.getPassword());
         ValidatableResponse response = userClient.create(user);
         userApi.createdSuccessfully(response);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), null));
-        userApi.loggedNotSuccessfully(loginResponse);
+        ValidatableResponse responseNew = userClient.loginWithoutBody(wrongLogData);
+        userApi.loggedNotSuccessfully(responseNew);
     }
 
     @Test
     @DisplayName("Изменение данных пользователя с авторизацией")
     public void editWithAuth() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
         ValidatableResponse response = userClient.create(user);
         userApi.createdSuccessfully(response);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
-        accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        ValidatableResponse editResponse = userClient.edit(user, accessToken);
+        LoginUser loginUser = LoginUser.from(user);
+        ValidatableResponse loginResponse = userClient.login(loginUser);
+        accessToken = userApi.loggedIsSuccessfully(loginResponse);
+        ValidatableResponse editResponse = userClient.edit(accessToken);
         userApi.editWithAuth(editResponse);
     }
 
     @Test
     @DisplayName("Изменение данных пользователя без авторизации")
     public void editWithoutAuth() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
         ValidatableResponse response = userClient.create(user);
         userApi.createdSuccessfully(response);
-        ValidatableResponse editResponse = userClient.edit(null, null);
+        ValidatableResponse editResponse = userClient.editNoAuth();
         userApi.editWithoutAuth(editResponse);
     }
 }

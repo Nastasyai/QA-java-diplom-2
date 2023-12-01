@@ -14,7 +14,6 @@ import static helper.IngredientGeneration.*;
 
 public class CreateOrder {
     private final OrderResponse orderResponse = new OrderResponse();
-    Order order;
     private final OrderClient orderClient = new OrderClient();
     private final UserClient userClient = new UserClient();
     private final UserApi userApi = new UserApi();
@@ -23,12 +22,13 @@ public class CreateOrder {
     @Test
     @DisplayName("Создание заказа с авторизацией и ингредиентами")
     public void getOrderListWithAuth() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
         ValidatableResponse createResponse = userClient.create(user);
         userApi.createdSuccessfully(createResponse);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
-        accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        order = new Order(List.of(Ingredient1, Ingredient2, Ingredient3, Ingredient4));
+        LoginUser loginUser = LoginUser.from(user);
+        ValidatableResponse loginResponse = userClient.login(loginUser);
+        accessToken = userApi.loggedIsSuccessfully(loginResponse);
+        var order = new Order(List.of(Ingredient1, Ingredient2, Ingredient3));
         ValidatableResponse response = orderClient.createOrder(order);
         orderResponse.assertCreatedOrder(response);
     }
@@ -36,20 +36,15 @@ public class CreateOrder {
     @Test
     @DisplayName("Создание заказа с ингредиентами, но без без авторизации")
     public void getOrderListWithoutAuth() {
-        order = new Order(List.of(Ingredient1, Ingredient2, Ingredient3, Ingredient4));
+        var order = new Order(List.of(Ingredient1, Ingredient2, Ingredient3));
         ValidatableResponse response = orderClient.createOrder(order);
-        orderResponse.assertCreatedWithoutAuth(response);
+        orderResponse.assertCreatedOrder(response);
     }
 
     @Test
     @DisplayName("Создание заказа без ингредиентов")
     public void assertCreatedOrderWithoutIngredients() {
-        var user = UserGeneration.getUser();
-        ValidatableResponse createResponse = userClient.create(user);
-        userApi.createdSuccessfully(createResponse);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
-        accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        order = new Order(null);
+        var order = new Order(null);
         ValidatableResponse response = orderClient.createOrder(order);
         orderResponse.assertCreatedOrderWithoutIngredients(response);
     }
@@ -57,12 +52,7 @@ public class CreateOrder {
     @Test
     @DisplayName("Создание заказа с неверным хешем ингредиентов")
     public void assertCreatedOrderWrongHash() {
-        var user = UserGeneration.getUser();
-        ValidatableResponse createResponse = userClient.create(user);
-        userApi.createdSuccessfully(createResponse);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
-        accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        order = new Order(List.of("000", "111", "222", "333"));
+        var order = new Order(List.of(Ingredient1, Ingredient2, Ingredient3, Unknown_Ingredient));
         ValidatableResponse response = orderClient.createOrder(order);
         orderResponse.assertCreatedOrderWrongHash(response);
     }

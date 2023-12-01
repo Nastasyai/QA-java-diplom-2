@@ -23,22 +23,23 @@ public class listOrders {
     @Test
     @DisplayName("Получение заказов авторизованного пользователя:")
     public void getOrderListWithAuth() {
-        var user = UserGeneration.getUser();
+        var user = UserGeneration.random();
         ValidatableResponse createResponse = userClient.create(user);
         userApi.createdSuccessfully(createResponse);
-        ValidatableResponse loginResponse = userClient.login(new LoginUser(user.getEmail(), user.getPassword()));
-        accessToken = String.valueOf(userApi.loggedIsSuccessfully(loginResponse));
-        order = new Order(List.of(Ingredient1, Ingredient2, Ingredient3, Ingredient4));
-        ValidatableResponse createOrderResponse = orderClient.createOrder(order);
-        orderResponse.assertCreatedOrder(createOrderResponse);
-        ValidatableResponse listResponse = orderClient.getOrderListWithAuth(accessToken);
-        orderResponse.assertListWitAuth(listResponse);
+        LoginUser loginUser = LoginUser.from(user);
+        ValidatableResponse loginResponse = userClient.login(loginUser);
+        accessToken = userApi.loggedIsSuccessfully(loginResponse);
+        var order = new Order(List.of(Ingredient1, Ingredient2, Ingredient3));
+        ValidatableResponse response = orderClient.createOrder(order);
+        orderResponse.assertCreatedOrder(response);
+        ValidatableResponse responseList = orderClient.getOrderListWithAuth(accessToken);
+        orderResponse.assertListWitAuth(responseList);
     }
 
     @Test
     @DisplayName("Получение заказов неавторизованного пользователя:")
     public void getOrderListWithoutAuth() {
-        ValidatableResponse listResponse = orderClient.getOrderListWithoutAuth();
-        orderResponse.assertCreatedWithoutAuth(listResponse);
+        ValidatableResponse response = orderClient.getOrderListWithoutAuth();
+        orderResponse.assertCreatedWithoutAuth(response);
     }
 }

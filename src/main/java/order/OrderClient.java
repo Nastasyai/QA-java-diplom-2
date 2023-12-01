@@ -24,7 +24,6 @@ public class OrderClient extends ConfigurationApi {
     public ValidatableResponse getOrderListWithAuth (String accessToken) {
         return getRequestSpec()
                 .contentType(ContentType.JSON)
-                .baseUri(ConfigurationApi.BASE_URL)
                 .headers(Map.of("Authorization", accessToken))
                 .when()
                 .get(ORDER_PATH)
@@ -34,7 +33,6 @@ public class OrderClient extends ConfigurationApi {
     public ValidatableResponse getOrderListWithoutAuth () {
         return getRequestSpec()
                 .contentType(ContentType.JSON)
-                .baseUri(ConfigurationApi.BASE_URL)
                 .when()
                 .get(ORDER_PATH)
                 .then().log().all();

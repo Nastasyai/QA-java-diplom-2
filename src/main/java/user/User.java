@@ -1,11 +1,11 @@
 package user;
 
-public class CreateUser {
+public class User {
     public String name;
     public String password;
     public String email;
 
-    public CreateUser(String name, String password, String email) {
+    public User(String name, String password, String email) {
         this.name = name;
         this.password = password;
         this.email = email;
